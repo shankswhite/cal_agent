@@ -2,6 +2,30 @@
 
 All notable changes to this project. Newest first.
 
+## 2026-11-17 — Clarification loop + interactive terminal
+
+### Changed
+- `app/agent.py`:
+  - **Required details per intention.** The agent asks until they are all given:
+    - booking: duration, start time (exact or a window), person joining
+    - get_all_events: a specific day or time window (no more default of the next 7 days)
+    - reschedule: the meeting's current start time and the new time; duration defaults to the meeting's current length
+    - cancel: the meeting's start time and which meeting it is (event type or duration), then a yes/no confirmation
+  - **Pending request.** A partial request is kept in `SchedulingAgent.pending`, and each follow-up answer is merged into it.
+  - **Past times are rejected.** A booking or reschedule time in the past is reported and the user is asked for a future time.
+  - **Owner email fallback.** With no attendee email, the booking uses `OWNER_EMAIL` as the contact. Cal.com rejects bookings with neither email nor phone (400 "Attendee must have at least one contact method").
+  - **Interactive terminal chat** (`.venv/bin/python app/agent.py`), with `quit`/`exit`.
+- `.env`: added `OWNER_EMAIL` (not tracked).
+
+### Added
+- `tests/test_samples.md` (user's test cases).
+- `tests/run_samples.py`: runs the samples, multi-turn clarification flows, and a reschedule + cancel conversation on a throwaway meeting, with cleanup.
+
+### Verified
+- All 9 samples behave as intended. Sample 6 asks for the duration (rule 1). Sample 9 reports that no 3pm meeting exists, because there is none.
+- Multi-turn flows complete after clarification (booking, get, reschedule).
+- Live reschedule (picked from offered options) and cancel (after confirmation) on a real meeting worked. Nothing left on the calendar.
+
 ## 2026-11-17 — Agent
 
 ### Added
