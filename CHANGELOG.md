@@ -2,6 +2,25 @@
 
 All notable changes to this project. Newest first.
 
+## 2026-11-17 — Agent
+
+### Added
+- `app/agent.py`: `SchedulingAgent` with `async respond(user_input) -> str`.
+  - Intention detection with the Pydantic model `UserIntent`: `booking`, `get_all_events`, `reschedule`, `cancel`, plus `unsupported` as the fallback. It uses Claude structured outputs (`client.beta.messages.parse`, model from `LLM_MODEL`) with server-side refusal fallback (`fallbacks="default"`).
+  - Dispatches to `cal_api.CalAPI`, run in a thread so `respond()` stays async. Replies are built only from Cal.com data.
+  - Booking: resolves the event type by duration or name, asks for missing attendee name/email/time, checks the requested time against free slots, and offers alternatives.
+  - Get: lists active meetings in the requested period (default: next 7 days).
+  - Reschedule: finds the meeting by time/attendee/type, checks the new time (or offers free times in a window), then reschedules.
+  - Cancel: finds the meeting, asks for yes/no confirmation, then cancels.
+  - Keeps the last 20 messages so follow-ups like "2pm works" and "yes" carry context.
+  - `python app/agent.py` starts a terminal chat loop for manual testing.
+- `requirements.txt`: added `anthropic`, `pydantic`.
+
+### Verified
+- Intention classification is correct for all three `NOTES.md` examples, plus a cancel request and an off-topic message (`unsupported`).
+- End-to-end read-only turns work: listing tomorrow's meetings, and a booking request that asks for missing details and then offers Thursday-afternoon slots.
+- Not yet tested end-to-end (they change real data): confirming a booking, reschedule, cancel through the agent.
+
 ## 2026-11-17 — Live API test
 
 ### Added
