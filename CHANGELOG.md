@@ -2,6 +2,18 @@
 
 All notable changes to this project. Newest first.
 
+## 2026-11-17 — Web UI (Gradio)
+
+### Added
+- `app/web.py`: Gradio `ChatInterface` web UI (`.venv/bin/python app/web.py` → http://127.0.0.1:7860).
+  - One `SchedulingAgent` per browser session via `gr.State`, so history and pending clarifications are per user.
+  - Example prompts from `NOTES.md`; host/port configurable with `WEB_HOST` / `WEB_PORT`.
+  - Chosen over Chainlit and Streamlit by user choice.
+- `requirements.txt`: added `gradio`.
+
+### Verified
+- Page serves HTTP 200. A 3-turn clarification conversation through the Gradio API keeps context and ends with slot options. A new session starts with fresh state.
+
 ## 2026-11-17 — Clarification loop + interactive terminal
 
 ### Changed
